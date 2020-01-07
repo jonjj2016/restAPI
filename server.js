@@ -10,12 +10,14 @@ const bootcampRouts = require('./routs/bootcapmRout');
 //import middlewares
 const morgan = require('morgan');
 const app = express();
+const errorHandler = require('./middleware/error');
 app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
 	app.use(morgan('dev'));
 }
 //mount routers
 app.use('/api/v1/bootcamp', bootcampRouts);
+app.use(errorHandler);
 const PORT = parseInt(process.env.PORT) || 8400;
 const server = app.listen(PORT, console.log(`Server is running in port ${PORT}`.yellow.bold));
 //Handle unhandled promise rejections

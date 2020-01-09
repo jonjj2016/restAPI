@@ -33,7 +33,7 @@ const getAll = asyncHandler(async (req, res, next) => {
 	}
 	//Pagination
 	const page = parseInt(req.query.page, 10) || 1;
-	const limit = parseInt(req.query.limit, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 10;
 	const startIndex = (page - 1) * limit;
 	const endIndex = page * limit;
 	const total = await Bootcamp.countDocuments();
@@ -82,10 +82,11 @@ const getOne = asyncHandler(async (req, res, next) => {
 	});
 });
 const deleteOne = asyncHandler(async (req, res, next) => {
-	let item = await Bootcamp.findByIdAndRemove(req.params.id).exec();
+	let item = await Bootcamp.findById(req.params.id).exec();
 	if (!item) {
 		return next(new ErrorResponse(`Couldn't update Bootcamp with id ${req.params.id}`, 400));
 	}
+	item.remove();
 	res.status(204).json({
 		status : 'Success',
 		data   : null

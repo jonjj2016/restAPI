@@ -7,6 +7,7 @@ dotENV.config({ path: './config/config.env' });
 connectDb();
 //Rout files
 const bootcampRouts = require('./routs/bootcapmRout');
+const coursesRouts = require('./routs/coursesRoute');
 //import middlewares
 const morgan = require('morgan');
 const app = express();
@@ -17,6 +18,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 //mount routers
 app.use('/api/v1/bootcamp', bootcampRouts);
+app.use('/api/v1/courses', coursesRouts);
 app.use(errorHandler);
 const PORT = parseInt(process.env.PORT) || 8400;
 const server = app.listen(PORT, console.log(`Server is running in port ${PORT}`.yellow.bold));

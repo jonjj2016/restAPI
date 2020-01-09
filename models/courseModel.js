@@ -37,5 +37,8 @@ const CourseSchema = new mongoose.Schema({
 		required : true
 	}
 });
-
+CourseSchema.pre(/find/, function (next) {
+	this.populate({ path: 'bootcamp', select: 'name description' });
+	next();
+});
 module.exports = mongoose.model('Course', CourseSchema);

@@ -43,7 +43,6 @@ CourseSchema.pre(/find/, function (next) {
 });
 //Static method to grt  average cost of course tuitions
 CourseSchema.statics.getAverageCost = async function (bootcampId) {
-	console.log('Calcullating average cost of courses'.blue);
 	const obj = await this.aggregate([
 		{
 			$match : {
@@ -71,7 +70,7 @@ CourseSchema.post('save', function (next) {
 // Call get average cost after remove
 
 CourseSchema.pre('remove', function (next) {
-	//this.constructor.getAverageCost(this.bootcamp);
+	this.constructor.getAverageCost(this.bootcamp);
 	next();
 });
 module.exports = mongoose.model('Course', CourseSchema);

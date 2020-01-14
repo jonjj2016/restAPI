@@ -1,3 +1,4 @@
+const path = require('path');
 const Bootcamp = require('../models/bootcampModel');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
@@ -84,7 +85,7 @@ const getOne = asyncHandler(async (req, res, next) => {
 const deleteOne = asyncHandler(async (req, res, next) => {
 	let item = await Bootcamp.findById(req.params.id).exec();
 	if (!item) {
-		return next(new ErrorResponse(`Couldn't update Bootcamp with id ${req.params.id}`, 400));
+		return next(new ErrorResponse(`Couldn't update Bootcamp with id ${req.params.id}`, 404));
 	}
 	item.remove();
 	res.status(204).json({
@@ -128,11 +129,49 @@ const getBootcampsInRadius = asyncHandler(async (req, res, next) => {
 		data   : bootcamps
 	});
 });
+//desc Upload photo for bootcmp
+//rout Put /api/v1/bootcamp/:id/photo
+const bootcampUploadPhoto = asyncHandler(async (req, res, next) => {
+	let item = await Bootcamp.findById(req.params.id).exec();
+	const file = req.files.file;
+	if (!item) {
+		return next(new ErrorResponse(`Couldn't update Bootcamp with id ${req.params.id}`, 404));
+	}
+	if (!req.files) {
+		return next(new ErrorResponse(`Please upload a file`, 400));
+	}
+	if (!file.mimetype.startsWith('image')) {
+		return next(new ErrorResponse(`Please upload an image file`, 400));
+	}
+	if (file.size > process.env.PHOTO_LIMIT) {
+		return next(
+			new ErrorResponse(
+				`${file.size / 1000000} Image size should be no more then ${process.env.PHOTO_LIMIT / 1000000}mb`,
+				400
+			)
+		);
+	}
+	//Create custom filename
+	file.name = `photo_${item._id}${path.parse(file.name).ext}`;
+	//saving photo
+	file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+		if (err) {
+			console.error(err);
+			return next(new ErrorResponse(`Problem with file upload`, 500));
+		}
+		await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+		res.status(200).json({
+			status : 'Success',
+			data   : file.name
+		});
+	});
+});
 module.exports = {
 	getAll,
 	getOne,
 	updateOne,
 	deleteOne,
 	postOne,
-	getBootcampsInRadius
+	getBootcampsInRadius,
+	bootcampUploadPhoto
 };

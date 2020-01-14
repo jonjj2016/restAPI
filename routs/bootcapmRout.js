@@ -9,4 +9,5 @@ routs.use('/:bootcampId/courses', courseRouter);
 routs.route('/').get(controller.getAll).post(controller.postOne);
 routs.route('/:id').get(controller.getOne).delete(controller.deleteOne).patch(controller.updateOne);
 routs.route('/radius/:zipcode/:distance').get(controller.getBootcampsInRadius);
+routs.route('/:id/photo').put(controller.bootcampUploadPhoto);
 module.exports = routs;

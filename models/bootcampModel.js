@@ -56,6 +56,7 @@ const bootcampSchema = new mongoose.Schema(
 			zipcode         : String,
 			country         : String
 		},
+
 		careers       : {
 			type     : [ String ],
 			required : true,
@@ -129,7 +130,8 @@ bootcampSchema.pre('remove', async function (next) {
 	await this.model('Course').deleteMany({ bootcamp: this._id });
 	next();
 });
-//bootcampSchema.virtual('courses', { ref: 'Course', localField: '_id', foreignField: 'bootcamp', justOne: false });
-bootcampSchema.virtual('co', { ref: 'Course', foreignField: 'bootcamp', localField: '_id', justOne: false });
+//Reverese Poulate with populate
+bootcampSchema.virtual('courses', { ref: 'Course', localField: '_id', foreignField: 'bootcamp', justOne: false });
+//bootcampSchema.virtual('co', { ref: 'Course', foreignField: 'bootcamp', localField: '_id', justOne: false });
 module.exports = mongoose.model('Bootcamp', bootcampSchema);
 //email

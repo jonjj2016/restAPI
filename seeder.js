@@ -21,7 +21,7 @@ const importData = async () => {
 	try {
 		await Bootcamp.create(bootcamps);
 		console.log('Data imported....'.green.inverse);
-		process.exit();
+		//process.exit();
 	} catch (err) {
 		console.error(err);
 	}
@@ -32,6 +32,7 @@ const importData = async () => {
 const deleteData = async () => {
 	try {
 		await Bootcamp.deleteMany();
+		//process.exit();
 		console.log('Data destroyed ....'.red.inverse);
 	} catch (err) {}
 };
@@ -42,6 +43,7 @@ const importCourses = async () => {
 	try {
 		await Course.create(courses);
 		console.log('Courses downloaded'.green.inverse);
+		process.exit();
 	} catch (err) {
 		console.error(err);
 	}
@@ -51,6 +53,7 @@ const deleteCourses = async () => {
 	try {
 		await Course.deleteMany();
 		console.log('Corses successfuly deleted'.red.inverse);
+		process.exit();
 	} catch (err) {
 		console.error(err);
 	}

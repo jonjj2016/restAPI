@@ -1,6 +1,22 @@
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/user');
+//Get token from model and creates cookie and responds
+const sendtokenResponse = (user, statuscode, res) => {
+	//create token
+	const token = user.getSignedJwtToken();
+	const options = {
+		expires  : new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
+		httpOnly : true
+	};
+	if ((process.env.NODE_ENV = 'production')) {
+		options.secure = true;
+	}
+	res.status(statuscode).cookie('token', token, options).json({
+		status : 'Success',
+		token
+	});
+};
 
 //desc Register User
 //route  /api/v1/auth/register
@@ -14,12 +30,7 @@ exports.register = asyncHandler(async (req, res, next) => {
 		password,
 		role
 	}).select('-password');
-	const token = user.getSignedJwtToken();
-	res.status(200).json({
-		status : 'Success',
-		token  : token,
-		data   : user
-	});
+	sendtokenResponse(user, 200, res);
 
 	next();
 });
@@ -42,10 +53,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 	if (!checkPassword) {
 		return next(new ErrorResponse('Invalid credentials', 401));
 	}
-	const token = user.getSignedJwtToken();
-	res.status(200).json({
-		status : 'Success',
-		token
-	});
+	sendtokenResponse(user, 200, res);
+
 	next();
 });

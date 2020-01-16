@@ -3,6 +3,7 @@ const connectDb = require('./config/db');
 const dotENV = require('dotenv');
 const path = require('path');
 const fileuploader = require('express-fileupload');
+const cookie_parser = require('cookie-parser');
 const colosr = require('colors');
 const errorHandler = require('./middleware/error');
 dotENV.config({ path: './config/config.env' });
@@ -17,6 +18,7 @@ const morgan = require('morgan');
 const app = express();
 app.use(express.json());
 app.use(fileuploader());
+app.use(cookie_parser());
 //Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === 'development') {

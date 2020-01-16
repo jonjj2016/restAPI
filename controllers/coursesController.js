@@ -7,18 +7,16 @@ const asyncHandler = require('../middleware/async');
 const Bootcamp = require('../models/bootcampModel');
 const ErrorResponse = require('../utils/errorResponse');
 const getMany = asyncHandler(async (req, res, next) => {
-	let query;
 	if (req.params.bootcampId) {
-		query = Course.find({ bootcamp: req.params.bootcampId });
+		const courses = await Course.find({ bootcamp: req.params.bootcampId });
+		res.status(200).json({
+			status : 'Success',
+			count  : courses.length,
+			data   : courses
+		});
 	} else {
-		query = Course.find();
+		res.status(200).json(res.advanceResults);
 	}
-	const courses = await query;
-	res.status(200).json({
-		status : 'Success',
-		count  : courses.length,
-		data   : courses
-	});
 });
 //Add course
 //route POST /api/v1/bootcamp/:bootcampId/courses

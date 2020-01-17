@@ -23,7 +23,9 @@ const getMany = asyncHandler(async (req, res, next) => {
 //access Privat
 const postOne = asyncHandler(async (req, res, next) => {
 	const id = req.params.bootcampId;
+
 	req.body.bootcamp = id;
+	req.body.user = req.user.id;
 	const bootcamp = await Bootcamp.findById(id).exec();
 	if (!bootcamp) {
 		return next(new ErrorResponse(`There is no Bootcamp with an Id ${id}`));
@@ -50,6 +52,9 @@ const updateOne = asyncHandler(async (req, res, next) => {
 	if (!item) {
 		return next(new ErrorResponse(`No course with id of ${req.params.id}`, 404));
 	}
+	if (req.user.id !== item.user.toString() && req.user.role !== 'admin') {
+		return next(new ErrorResponse(`User ${req.user.id} is not autherized to update this Bootcamp`, 401));
+	}
 	item = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: false });
 	res.status(200).json({
 		status : 'Success',
@@ -59,8 +64,12 @@ const updateOne = asyncHandler(async (req, res, next) => {
 
 const deleteOne = asyncHandler(async (req, res, next) => {
 	let item = await Course.findById(req.params.id);
+	console.log(item.user);
 	if (!item) {
 		return next(new ErrorResponse(`No course with id of ${req.params.id}`, 404));
+	}
+	if (req.user.id !== item.user.toString() && req.user.role !== 'admin') {
+		return next(new ErrorResponse(`User ${req.user.id} is not autherized to update this Bootcamp`, 401));
 	}
 	await Course.findByIdAndRemove(req.params.id);
 	res.status(204).json({

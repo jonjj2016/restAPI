@@ -41,6 +41,10 @@ const deleteOne = asyncHandler(async (req, res, next) => {
 	if (!item) {
 		return next(new ErrorResponse(`Couldn't update Bootcamp with id ${req.params.id}`, 404));
 	}
+	//Make sure that its owner who deletes the bootcamp or admin
+	if (req.user.id !== item.user.toString() && req.user.role !== 'admin') {
+		return next(new ErrorResponse(`User ${req.user.id} is not autherized to delete this Bootcamp`, 401));
+	}
 	item.remove();
 	res.status(204).json({
 		status : 'Success',
@@ -48,14 +52,16 @@ const deleteOne = asyncHandler(async (req, res, next) => {
 	});
 });
 const updateOne = asyncHandler(async (req, res, next) => {
-	const item = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-		new           : true,
-		runValidators : false
-	});
-
+	let item = await Bootcamp.findById(req.params.id);
 	if (!item) {
 		return next(new ErrorResponse(`Couldn't update Bootcamp with id ${req.params.id}`, 400));
 	}
+	//Make sure user is bootcamp owner
+	if (item.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return next(new ErrorResponse(`User ${req.user.id} is not autherized to update this Bootcamp`, 401));
+	}
+	item = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: false });
+
 	res.status(301).json({
 		status : 'Success',
 		data   : item
@@ -90,6 +96,9 @@ const bootcampUploadPhoto = asyncHandler(async (req, res, next) => {
 	const file = req.files.file;
 	if (!item) {
 		return next(new ErrorResponse(`Couldn't update Bootcamp with id ${req.params.id}`, 404));
+	}
+	if (item.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return next(new ErrorResponse(`User ${req.user.id} is not autherized to update bootcamp`, 401));
 	}
 	if (!req.files) {
 		return next(new ErrorResponse(`Please upload a file`, 400));

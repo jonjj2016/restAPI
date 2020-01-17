@@ -29,7 +29,7 @@ exports.register = asyncHandler(async (req, res, next) => {
 		email,
 		password,
 		role
-	}).select('-password');
+	});
 	sendtokenResponse(user, 200, res);
 
 	next();
@@ -56,4 +56,14 @@ exports.login = asyncHandler(async (req, res, next) => {
 	sendtokenResponse(user, 200, res);
 
 	next();
+});
+//desc Get current logged in user
+//route /api/v1/user/me
+//access Privat
+exports.getme = asyncHandler(async (req, res, next) => {
+	const user = await User.findById(req.user.id);
+	res.status(200).json({
+		status : 'Success',
+		data   : user
+	});
 });

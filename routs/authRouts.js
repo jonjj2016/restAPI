@@ -5,5 +5,5 @@ const router = express.Router();
 router.post('/register', controller.register);
 router.post('/login', controller.login);
 router.get('/me', authController.protect, controller.getme);
-
+router.post('/forgotpassword', controller.forgotPassword);
 module.exports = router;

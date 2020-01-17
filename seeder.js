@@ -32,6 +32,7 @@ const importData = async () => {
 		//import user data
 		await User.create(users);
 		console.log('Data imported....'.green.inverse);
+		process.exit();
 		//process.exit();
 	} catch (err) {
 		console.error(err);

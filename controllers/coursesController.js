@@ -53,7 +53,7 @@ const updateOne = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`No course with id of ${req.params.id}`, 404));
 	}
 	if (req.user.id !== item.user.toString() && req.user.role !== 'admin') {
-		return next(new ErrorResponse(`User ${req.user.id} is not autherized to update this Bootcamp`, 401));
+		return next(new ErrorResponse(`User ${req.user.id} is not autherized to update this Course ${item.id}`, 401));
 	}
 	item = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: false });
 	res.status(200).json({
@@ -69,7 +69,7 @@ const deleteOne = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`No course with id of ${req.params.id}`, 404));
 	}
 	if (req.user.id !== item.user.toString() && req.user.role !== 'admin') {
-		return next(new ErrorResponse(`User ${req.user.id} is not autherized to update this Bootcamp`, 401));
+		return next(new ErrorResponse(`User ${req.user.id} is not autherized to delete this Course ${item.id}`, 401));
 	}
 	await Course.findByIdAndRemove(req.params.id);
 	res.status(204).json({

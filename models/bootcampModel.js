@@ -107,7 +107,7 @@ const bootcampSchema = new mongoose.Schema(
 //create Bootcamp slug from the name
 bootcampSchema.pre('save', function (next) {
 	this.slug = slugify(this.name, { lower: true });
-	console.log('slugify run', this.slug);
+	//console.log('slugify run', this.slug);
 	next();
 });
 //Geocode create location field
@@ -130,7 +130,7 @@ bootcampSchema.pre('save', async function (next) {
 //Cascade delete courses when a bootcamp is deleted
 
 bootcampSchema.pre('remove', async function (next) {
-	console.log(`Courses being deleted from bootcamp ${this.name}`);
+	//console.log(`Courses being deleted from bootcamp ${this.name}`);
 
 	await this.model('Course').deleteMany({ bootcamp: this._id });
 	next();

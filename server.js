@@ -5,6 +5,7 @@ const path = require('path');
 const fileuploader = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const cookie_parser = require('cookie-parser');
+const helmet = require('helmet');
 const colosr = require('colors');
 const errorHandler = require('./middleware/error');
 dotENV.config({ path: './config/config.env' });
@@ -23,6 +24,8 @@ app.use(express.json());
 app.use(fileuploader());
 app.use(cookie_parser());
 app.use(mongoSanitize());
+//SET SEQURITY HEADERS //XSS PROTECT HEADERS
+app.use(helmet());
 //Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === 'development') {

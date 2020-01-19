@@ -7,6 +7,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const cookie_parser = require('cookie-parser');
 const helmet = require('helmet');
 const xss_clean = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
 const colosr = require('colors');
 const errorHandler = require('./middleware/error');
 dotENV.config({ path: './config/config.env' });
@@ -18,6 +20,12 @@ const coursesRouts = require('./routs/coursesRoute');
 const authRouter = require('./routs/authRouts');
 const userRouter = require('./routs/users.Routs');
 const reviewRouter = require('./routs/reviews.Router');
+
+//Limiting requests per minute
+const requests = rateLimit({
+	windowMs : 20 * 60 * 1000,
+	max      : 140
+});
 //import middlewares
 const morgan = require('morgan');
 const app = express();
@@ -29,9 +37,13 @@ app.use(cookie_parser());
 app.use(mongoSanitize());
 //SET SEQURITY HEADERS //XSS PROTECT HEADERS
 app.use(helmet());
-//Set static folder
 //Prevent XSS attaks
 app.use(xss_clean());
+//aplying limiter
+app.use(requests());
+// preventing request parametr polution
+app.use(hpp());
+//Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === 'development') {
 	app.use(morgan('dev'));

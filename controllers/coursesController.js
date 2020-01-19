@@ -6,6 +6,9 @@ const Course = require('../models/courseModel');
 const asyncHandler = require('../middleware/async');
 const Bootcamp = require('../models/bootcampModel');
 const ErrorResponse = require('../utils/errorResponse');
+//Get course
+//route Get /api/v1/courses
+//access Privat
 const getMany = asyncHandler(async (req, res, next) => {
 	if (req.params.bootcampId) {
 		const courses = await Course.find({ bootcamp: req.params.bootcampId });
@@ -28,7 +31,7 @@ const postOne = asyncHandler(async (req, res, next) => {
 	req.body.user = req.user.id;
 	const bootcamp = await Bootcamp.findById(id).exec();
 	if (!bootcamp) {
-		return next(new ErrorResponse(`There is no Bootcamp with an Id ${id}`));
+		return next(new ErrorResponse(`There is no Bootcamp with an Id ${id}`, 404));
 	}
 	const item = await Course.create(req.body);
 	res.status(200).json({
@@ -36,6 +39,9 @@ const postOne = asyncHandler(async (req, res, next) => {
 		data   : item
 	});
 });
+//Get one Course
+//route POST /api/v1/courses/:id
+//access Privat
 const getOne = asyncHandler(async (req, res, next) => {
 	const item = await Course.findById(req.params.id).exec();
 
@@ -47,6 +53,9 @@ const getOne = asyncHandler(async (req, res, next) => {
 		data   : item
 	});
 });
+//Get one Course
+//route POST /api/v1/courses/:id
+//access Privat
 const updateOne = asyncHandler(async (req, res, next) => {
 	let item = await Course.findById(req.params.id);
 	if (!item) {

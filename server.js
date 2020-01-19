@@ -14,6 +14,7 @@ const bootcampRouts = require('./routs/bootcapmRout');
 const coursesRouts = require('./routs/coursesRoute');
 const authRouter = require('./routs/authRouts');
 const userRouter = require('./routs/users.Routs');
+const reviewRouter = require('./routs/reviews.Router');
 //import middlewares
 const morgan = require('morgan');
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/v1/bootcamp', bootcampRouts);
 app.use('/api/v1/courses', coursesRouts);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/auth/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 app.use(errorHandler);
 const PORT = parseInt(process.env.PORT) || 8400;
 const server = app.listen(PORT, console.log(`Server is running in port ${PORT}`.yellow.bold));

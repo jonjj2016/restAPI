@@ -4,11 +4,13 @@ const controller = require('../controllers/bootcampsController');
 //Include other resource routers
 const model = require('../models/bootcampModel');
 const courseRouter = require('./coursesRoute');
+const reviewRouter = require('./reviews.Router');
 const advanceQuery = require('../middleware/AdvanceQuery');
 const { protect, authorize } = require('../middleware/auth');
 const routs = express.Router();
 //Re-Route into other resource routers
 routs.use('/:bootcampId/courses', courseRouter);
+routs.use('/:bootcampId/reviews', reviewRouter);
 routs
 	.route('/')
 	.get(advanceQuery(model, 'courses'), controller.getAll)

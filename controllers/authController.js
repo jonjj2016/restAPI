@@ -111,7 +111,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 	user.resetPasswordToken = undefined;
 	user.resetPasswordExpire = undefined;
 	user.password = req.body.password;
-	await user.save();
+	await user.save({ validateBeforeSave: false });
 	sendtokenResponse(user, 201, res);
 });
 //desc PATCH update user details

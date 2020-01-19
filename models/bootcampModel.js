@@ -135,6 +135,7 @@ bootcampSchema.pre('remove', async function (next) {
 	await this.model('Course').deleteMany({ bootcamp: this._id });
 	next();
 });
+
 //Reverese Poulate with populate
 bootcampSchema.virtual('courses', { ref: 'Course', localField: '_id', foreignField: 'bootcamp', justOne: false });
 //bootcampSchema.virtual('co', { ref: 'Course', foreignField: 'bootcamp', localField: '_id', justOne: false });

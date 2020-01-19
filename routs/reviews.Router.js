@@ -1,6 +1,6 @@
 const express = require('express');
 const model = require('../models/reviews.Model');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 const controllers = require('../controllers/review.Controller');
 //Midlewares
@@ -11,7 +11,11 @@ router.use(protect);
 router
 	.route('/')
 	.get(advanceQuery(model, { path: 'bootcamp', select: 'name description' }), controllers.allReviews)
-	.post(controllers.postReview);
-router.route('/:id').delete(controllers.deleteReview).patch(controllers.updateReview).get(controllers.getOneReview);
+	.post(protect, authorize('user', 'admin'), controllers.postReview);
+router
+	.route('/:id')
+	.delete(protect, controllers.deleteReview)
+	.patch(protect, controllers.updateReview)
+	.get(protect, controllers.getOneReview);
 
 module.exports = router;

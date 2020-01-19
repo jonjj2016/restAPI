@@ -30,7 +30,7 @@ exports.postReview = asyncHandler(async (req, res, next) => {
 	}
 	const review = await (await Review.create(req.body)).populate({ path: 'bootcamp', select: 'name description' });
 
-	res.status(200).json({
+	res.status(201).json({
 		status : 'Success',
 		data   : review
 	});
@@ -46,12 +46,11 @@ exports.deleteReview = asyncHandler(async (req, res, next) => {
 	//Check if its reviews owner is deleting or not
 	if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
 		return next(
-			new ErrorResponse(`User with id ${req.user.id} is not alowed to delete review ${req.params.id}`),
-			401
+			new ErrorResponse(`User with id ${req.user.id} is not alowed to delete review ${req.params.id}`, 401)
 		);
 	}
 	await review.remove();
-	res.status(202).json({
+	res.status(204).json({
 		status : 'Success',
 		data   : null
 	});
@@ -81,7 +80,7 @@ exports.updateReview = asyncHandler(async (req, res, next) => {
 
 	if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
 		return next(
-			new ErrorResponse(`User with id ${req.user.id} is not alowed to update review ${req.params.id}`, 404)
+			new ErrorResponse(`User with id ${req.user.id} is not alowed to update review ${req.params.id}`, 401)
 		);
 	}
 	const updatedRevew = await Review.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: false });

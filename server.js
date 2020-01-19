@@ -6,6 +6,7 @@ const fileuploader = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const cookie_parser = require('cookie-parser');
 const helmet = require('helmet');
+const xss_clean = require('xss-clean');
 const colosr = require('colors');
 const errorHandler = require('./middleware/error');
 dotENV.config({ path: './config/config.env' });
@@ -21,12 +22,16 @@ const reviewRouter = require('./routs/reviews.Router');
 const morgan = require('morgan');
 const app = express();
 app.use(express.json());
+//enabling file upload
 app.use(fileuploader());
 app.use(cookie_parser());
+//Sanitizing data
 app.use(mongoSanitize());
 //SET SEQURITY HEADERS //XSS PROTECT HEADERS
 app.use(helmet());
 //Set static folder
+//Prevent XSS attaks
+app.use(xss_clean());
 app.use(express.static(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === 'development') {
 	app.use(morgan('dev'));

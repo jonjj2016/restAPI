@@ -9,6 +9,7 @@ const helmet = require('helmet');
 const xss_clean = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
+const cors = require('cors');
 const colosr = require('colors');
 const errorHandler = require('./middleware/error');
 dotENV.config({ path: './config/config.env' });
@@ -23,8 +24,8 @@ const reviewRouter = require('./routs/reviews.Router');
 
 //Limiting requests per minute
 const requests = rateLimit({
-	windowMs : 20 * 60 * 1000,
-	max      : 140
+	windowMs : 10 * 60 * 1000,
+	max      : 120
 });
 //import middlewares
 const morgan = require('morgan');
@@ -40,9 +41,11 @@ app.use(helmet());
 //Prevent XSS attaks
 app.use(xss_clean());
 //aplying limiter
-app.use(requests());
-// preventing request parametr polution
+app.use(requests);
+// preventing http parametr polution
 app.use(hpp());
+//enabling CORS
+app.use(cors());
 //Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === 'development') {

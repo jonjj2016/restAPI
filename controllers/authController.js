@@ -1,6 +1,9 @@
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
+const crypto = require('crypto');
 const User = require('../models/user');
+const sendEmail = require('../utils/sendemail');
+
 //Get token from model and creates cookie and responds
 const sendtokenResponse = (user, statuscode, res) => {
 	//create token
@@ -66,7 +69,8 @@ exports.getme = asyncHandler(async (req, res, next) => {
 		status : 'Success',
 		data   : user
 	});
-}); //desc forgot  password
+});
+//desc forgot  password
 //route /api/v1/user/forgotpassword
 //access Pblic
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
@@ -78,9 +82,81 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 	//Get our reset token
 	const resetToken = user.getResetPasswordToken();
 	await user.save({ validateBeforeSave: false });
-	console.log(resetToken);
-	res.status(200).json({
-		status : 'Success',
-		data   : user
-	});
+	//Create reset url
+	const resetURL = `${req.protocol}://${req.get('host')}/api/v1/resetPassword/${resetToken}`;
+	const message = `You are receiving this email because you or someone elese has requested the reset of a passsword .Please make a PUT requeset to \n\n ${resetURL}`;
+	try {
+		await sendEmail({ email: user.email, subject: 'Password reset token', message });
+		res.status(200).json({
+			status : 'Success',
+			data   : 'Email sent'
+		});
+	} catch (err) {
+		user.resetPasswordExpire = undefined;
+		user.resetPasswordToken = undefined;
+		await user.save({ validateBeforeSave: false });
+		next(new ErrorResponse('Email could not be sent'));
+	}
+});
+//desc Reset password
+//route /api/v1/user/resetpassword/:resettoken
+//access Public
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+	const resetToken = req.params.resettoken;
+	const encrepted = crypto.createHash('sha256').update(resetToken).digest('hex');
+	const user = await User.findOne({ resetPasswordToken: encrepted, resetPasswordExpire: { $gt: Date.now() } });
+	if (!user || !req.body.password) {
+		return next(new ErrorResponse(`Invalid Credentials`, 400));
+	}
+	user.resetPasswordToken = undefined;
+	user.resetPasswordExpire = undefined;
+	user.password = req.body.password;
+	await user.save();
+	sendtokenResponse(user, 201, res);
+});
+//desc PATCH update user details
+//route /api/v1/user/update
+//access Privat
+// exports.getme = asyncHandler(async (req, res, next) => {
+// 	const user = await User.findById(req.user.id);
+// 	res.status(200).json({
+// 		status : 'Success',
+// 		data   : user
+// 	});
+// });
+exports.updateUserDetails = asyncHandler(async (req, res, next) => {
+	const fieldsToUpdate = {
+		email : req.body.email,
+		name  : req.body.name
+	};
+	const updatedUser = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, { new: true, runValidators: true });
+	req.user = updatedUser;
+	sendtokenResponse(updatedUser, 201, res);
+	// res.status(200).json({
+	// 	status : 'Success',
+	// 	data   : updatedUser
+	// });
+});
+//desc PATCH update user details
+//route /api/v1/user/update
+//access Privat
+exports.updateUserPassword = asyncHandler(async (req, res, next) => {
+	const user = await User.findById(req.user.id).select('+password');
+	const isMatch = await user.matchPassword(req.body.password);
+	if (
+		!req.body.password ||
+		!req.body.newPassword ||
+		req.body.newPassword !== req.body.confirmPassword ||
+		!req.body.confirmPassword
+	) {
+		return next(new ErrorResponse(`Invalid Credentials`, 400));
+	}
+
+	if (!isMatch) {
+		return next(new ErrorResponse(`Invalid Credentials`, 400));
+	}
+
+	user.password = req.body.newPassword;
+	await user.save({ runValidators: true });
+	sendtokenResponse(user, 201, res);
 });

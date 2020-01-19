@@ -12,7 +12,8 @@ connectDb();
 //Rout files
 const bootcampRouts = require('./routs/bootcapmRout');
 const coursesRouts = require('./routs/coursesRoute');
-const userAuthRouter = require('./routs/authRouts');
+const authRouter = require('./routs/authRouts');
+const userRouter = require('./routs/users.Routs');
 //import middlewares
 const morgan = require('morgan');
 const app = express();
@@ -27,7 +28,8 @@ if (process.env.NODE_ENV === 'development') {
 //mount routers
 app.use('/api/v1/bootcamp', bootcampRouts);
 app.use('/api/v1/courses', coursesRouts);
-app.use('/api/v1/user', userAuthRouter);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/auth/users', userRouter);
 app.use(errorHandler);
 const PORT = parseInt(process.env.PORT) || 8400;
 const server = app.listen(PORT, console.log(`Server is running in port ${PORT}`.yellow.bold));
